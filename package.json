@@ -1,0 +1,32 @@
+{
+  "name": "omen.ritual",
+  "version": "1.0.0",
+  "description": "Ωmen Ritual: Text UI",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "watch": "npx nodemon index.js -I"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "blessed": "^0.1.81",
+    "blessed-contrib": "^4.8.18",
+    "chalk": "^3.0.0",
+    "midi": "^1.0.0",
+    "midi-player-js": "^2.0.5",
+    "neo-blessed": "^0.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "src",
+      "./index.js"
+    ],
+    "delay": "100"
+  }
+}
