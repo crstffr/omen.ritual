@@ -2,17 +2,19 @@
  * Enum for Track Modes
  *
  * @readonly
- * @typedef {number} TrackMode
+ * @typedef {string} TrackMode
  * @enum {TrackMode}
  */
 export const PatternModes = {
 
-  LOOP: 1,
+  LOOP: 'LOOP',
 
-  ONCE: 2,
+  ONCE: 'ONCE',
 
-  STEP: 3,
+  STEP: 'STEP',
 
-  TOGL: 4
+  TOGL: 'TOGL',
+
+  TRIG: 'TRIG'
 
 };
