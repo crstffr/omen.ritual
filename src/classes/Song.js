@@ -1,9 +1,9 @@
+import { MidiIO } from './LocalMidi';
+
 
 export class Song {
 
   constructor (opts) {
-
-    if (!opts.io) throw new Error('Song requires io option');
 
     const {
       channel = 16,
@@ -13,18 +13,13 @@ export class Song {
     /** @type {number} */
     this.channel = channel;
 
-    /** @type {LocalMidi} */
-    this.io = io;
-
     /** @type {Pattern[]} */
     this.patterns = [];
 
     /** @type {string} */
     this.name = 'song-name';
 
-    if (this.io) {
-      this.io.onMessage(this.checkForTrigNotes);
-    }
+    MidiIO.onMessage(this.checkForTrigNotes);
 
   }
 

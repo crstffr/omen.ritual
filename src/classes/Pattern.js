@@ -1,4 +1,5 @@
 import { Player } from 'midi-player-js';
+import { MidiIO } from './LocalMidi';
 import { absFromRoot } from '../utils/root';
 
 import { PatternModes } from './PatternModes';
@@ -8,16 +9,15 @@ export class Pattern {
 
   constructor (opts) {
 
-    if (!opts.io) throw new Error('Pattern requires "io" option');
-
     const {
       active    = true,
       autoPlay  = true,
       channel   = 1,
       file      = '',
-      io        = {},
       mode      = PatternModes.LOOP,
-      tempo     = 120,
+      padEnd    = 0,
+      padStart  = 0,
+      tempo     = 0,
       trigNote  = 36,
       transpose = 0,
       type      = PatternTypes.KEYS,
@@ -35,11 +35,14 @@ export class Pattern {
     /** @type {string} */
     this.file = file;
 
-    /** @type {LocalMidi} */
-    this.io = io;
-
     /** @type {TrackMode} */
     this.mode = mode;
+
+    /** @type {number} */
+    this.padEnd = padEnd;
+
+    /** @type {number} */
+    this.padStart = padStart;
 
     /** @type {number} */
     this.tempo = tempo;
@@ -72,15 +75,7 @@ export class Pattern {
     this.player.on('endOfFile', this.onPatternEnd);
     this.player.sampleRate = 0;
 
-
-
     this.loadFile(this.file);
-    this.setTempo(this.tempo);
-    this.io.onTempoChange(this.setTempo);
-
-    console.log(this.player);
-    console.log(this.player.getSongTime());
-
   }
 
   /**
@@ -138,17 +133,26 @@ export class Pattern {
   /**
    *
    */
-  play = () => {
-    if (this.player.isPlaying()) return;
-    console.log('PLAY');
-    this.player.play();
-    this.isPlaying = true;
+  play = (immediate) => {
+    setTimeout(() => {
+      if (this.player.isPlaying()) return;
+
+      this.player.play();
+      this.isPlaying = true;
+
+      setTimeout(() => {
+        if (this.tempo > 0) return;
+        this.setTempo(MidiIO.clockTempo);
+      }, 100);
+
+    }, immediate ? 0 : this.padStart);
   };
 
   /**
    *
    */
-  stop = () => {
+  resetPlayer = () => {
+
     this.player.stop();
     this.isPlaying = false;
 
@@ -159,18 +163,28 @@ export class Pattern {
       const event = this.openNotes[note];
       this.onPatternEvents({...event, name: 'Note off'});
     });
+  };
+
+  /**
+   *
+   */
+  stop = () => {
+
+    this.resetPlayer();
+    this.setTempo(MidiIO.clockTempo);
 
   };
 
+  /**
+   * Trigger this pattern, which can behave differently
+   * depending on the pattern mode.
+   */
   trigger = () => {
     if (!this.active) return;
     switch (this.mode) {
 
       case PatternModes.LOOP:
       case PatternModes.ONCE:
-
-        console.log(this.isPlaying ? 'stop' : 'play');
-
         if (this.isPlaying) return this.stop();
         this.play();
         break;
@@ -197,14 +211,14 @@ export class Pattern {
       case 'Note on':
         event.noteNumber += this.transpose;
         this.openNotes[event.noteNumber] = event;
-        this.io.encoder.noteOn(this.channel, event.noteNumber, event.velocity);
-        console.log('ON', this.channel, event.noteNumber);
+        MidiIO.encoder.noteOn(this.channel, event.noteNumber, event.velocity);
+        // console.log('ON', this.channel, event.noteNumber);
         break;
 
       case 'Note off':
         delete this.openNotes[event.noteNumber];
-        this.io.encoder.noteOff(this.channel, event.noteNumber, event.velocity);
-        console.log('OFF', this.channel, event.noteNumber);
+        MidiIO.encoder.noteOff(this.channel, event.noteNumber, event.velocity);
+        // console.log('OFF', this.channel, event.noteNumber);
         break;
 
       default:
@@ -213,24 +227,21 @@ export class Pattern {
 
   };
 
+  /**
+   *
+   */
   onPatternEnd = () => {
-
-    console.log('EEEEEEEEENNNNNDDDDDD');
-    console.log('EEEEEEEEENNNNNDDDDDD');
-    console.log('EEEEEEEEENNNNNDDDDDD');
-    console.log('EEEEEEEEENNNNNDDDDDD');
-    console.log('EEEEEEEEENNNNNDDDDDD');
 
     setTimeout(() => {
 
-      this.stop();
+      this.resetPlayer();
 
       if (this.mode === PatternModes.LOOP) {
-        setTimeout(() => this.play(), 0);
+        console.log('LOOP');
+        setTimeout(() => this.play(true), 0);
       }
 
-    }, 200);
-
+    }, this.padEnd);
   }
 
 }
