@@ -19,7 +19,11 @@ export class Song {
     /** @type {string} */
     this.name = 'song-name';
 
-    MidiIO.onMessage(this.checkForTrigNotes);
+    MidiIO.onMessage((msg) => {
+      if (msg.type === 'Start') return this.play();
+      if (msg.type === 'Stop')  return this.stop();
+      this.checkForTrigNotes(msg);
+    });
 
   }
 

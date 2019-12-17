@@ -18,7 +18,7 @@ export class Pattern {
       padEnd    = 0,
       padStart  = 0,
       tempo     = 0,
-      trigNote  = 36,
+      trigNote  = 0,
       transpose = 0,
       type      = PatternTypes.KEYS,
     } = opts;
@@ -237,7 +237,6 @@ export class Pattern {
       this.resetPlayer();
 
       if (this.mode === PatternModes.LOOP) {
-        console.log('LOOP');
         setTimeout(() => this.play(true), 0);
       }
 

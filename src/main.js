@@ -14,25 +14,10 @@ const MySong = new Song({
   channel: 14
 });
 
-MidiIO.onMessage(msg => {
-
-  switch (msg.type) {
-    case 'Start':
-      return MySong.play();
-
-    case 'Stop':
-      return MySong.stop();
-  }
-
-  if (msg.type === 'TimingClock') return;
-  if (msg.type === 'Start') return MySong.play();
-  if (msg.type === 'Stop')  return MySong.stop();
-  // console.log(msg);
-});
-
 MySong.addPattern(new Pattern({
   channel: 2,
+  trigNote: 36,
   autoPlay: true,
   mode: PatternModes.LOOP,
-  file: 'midi/01.mid',
+  file: 'midi/chords/03.mid',
 }));
