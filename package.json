@@ -4,17 +4,21 @@
   "description": "Ωmen Ritual: Text UI",
   "main": "src/index.js",
   "scripts": {
-    "start": "node main.js"
+    "start": "node main.js",
+    "watch": "nodemon main.js",
+    "tui": "nodemon -I -w ./src -r esm ./src/tui.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@lachenmayer/midi-messages": "^1.0.1",
+    "@types/blessed": "^0.1.15",
     "blessed": "^0.1.81",
     "blessed-contrib": "^4.8.18",
     "chalk": "^3.0.0",
     "esm": "^3.2.25",
+    "flatted": "^2.0.1",
     "midi": "^1.0.0",
     "midi-player-js": "^2.0.5",
     "neo-blessed": "^0.2.0",

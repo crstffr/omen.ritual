@@ -18,3 +18,12 @@ export const PatternModes = {
   TRIG: 'TRIG'
 
 };
+
+/**
+ *
+ * @type {(PatternModes|TrackMode)[]}
+ */
+export const PatternModesList = [
+  PatternModes.LOOP,
+  PatternModes.ONCE
+];

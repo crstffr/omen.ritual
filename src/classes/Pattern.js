@@ -1,3 +1,4 @@
+import path from 'path';
 import { Player } from 'midi-player-js';
 import { MidiIO } from './LocalMidi';
 import { absFromRoot } from '../utils/root';
@@ -83,8 +84,14 @@ export class Pattern {
    */
   loadFile = (file) => {
     if (!file) return;
-    this.file = absFromRoot(file);
-    this.player.loadFile(this.file);
+    this.player.loadFile(absFromRoot(path.join('midi', file)));
+  };
+
+  /**
+   * @param {boolean} autoPlay
+   */
+  setAutoPlay = (autoPlay) => {
+    this.autoPlay = autoPlay;
   };
 
   /**

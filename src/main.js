@@ -19,5 +19,5 @@ MySong.addPattern(new Pattern({
   trigNote: 36,
   autoPlay: true,
   mode: PatternModes.LOOP,
-  file: 'midi/chords/03.mid',
+  file: 'midi/example/zelda.mid',
 }));
