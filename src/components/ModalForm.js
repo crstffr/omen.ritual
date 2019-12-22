@@ -19,9 +19,6 @@ export class ModalForm {
       height = 'shrink'
     } = opts;
 
-    log('opts', opts);
-    log('width', width);
-
     this.node = blessed.box({
       width: '100%-2',
       height: '100%-2',
@@ -32,6 +29,7 @@ export class ModalForm {
     });
 
     this.node.on('opened', () => this.focus());
+
     this.node.on('rerender', () => this.rerender());
 
     this.form = blessed.form({

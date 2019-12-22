@@ -1,4 +1,5 @@
 import c from 'chalk';
+import path from 'path';
 import blessed from 'blessed';
 import contrib from 'blessed-contrib';
 import { clone } from '../utils/clone';
@@ -7,6 +8,8 @@ import { uid } from '../utils/uid';
 
 import { PatternModesList } from '../classes/PatternModes';
 import { ModalFormSingleInput } from './ModalFormSingleInput';
+import {ModalFormFilePicker} from './ModalFormFilePicker';
+import {absFromRoot} from '../utils/root';
 
 const ChanModal = new ModalFormSingleInput({
   label: 'Channel',
@@ -29,6 +32,12 @@ const TrigModal = new ModalFormSingleInput({
   valueMax: 127,
   valueMin: 0,
   inputWidth: 4
+});
+
+const FileModal = new ModalFormFilePicker({
+  label: 'File',
+  baseDir: absFromRoot('/midi'),
+  validFileExts: ['.mid', '.midi']
 });
 
 export class PatternListRow {
@@ -77,7 +86,7 @@ export class PatternListRow {
       height: 1,
       top: 0,
       padding: {
-        left: 1,
+        left: 0,
         right: 1
       },
       style: {
@@ -155,6 +164,10 @@ export class PatternListRow {
         button.on('focus', this.rowFocus);
         button.on('blur', this.rowBlur);
         button.key(['delete'], this.rowDelete);
+        button.key(['i'], this.rowInsert);
+        button.key(['enter'], () => this.editProp('FILE'));
+        button.key(['a'], () => this.editProp('ACTIVE'));
+        button.key(['p'], () => this.editProp('AUTO'));
       }
 
     });
@@ -181,6 +194,10 @@ export class PatternListRow {
     this.node.emit('deleteRow', this.index);
   };
 
+  rowInsert = () => {
+    this.node.emit('insertRow', this.index);
+  };
+
   colFocus = (col) => {
     if (!this.cols[col]) return;
     this.rowBlur();
@@ -204,8 +221,23 @@ export class PatternListRow {
         ChanModal.setValue(this.pattern.channel);
         ChanModal.open((result) => {
           const chan = Number(result.input);
-          if (isNaN(chan) || chan < 1 || chan > 16) return false;
+          if (!ChanModal.validate(chan)) return false;
           this.pattern.setChannel(chan);
+          this.updateProps();
+          return true;
+        });
+        break;
+
+      case 'FILE':
+        FileModal.setValue(this.pattern.file);
+        FileModal.open((result) => {
+          const file = result.input;
+          log('submit', file);
+          if (!FileModal.validate(file)) {
+            log('invalid', file);
+            return false;
+          }
+          this.pattern.loadFile(file);
           this.updateProps();
           return true;
         });
@@ -215,7 +247,7 @@ export class PatternListRow {
         ModeModal.setValue(this.pattern.mode);
         ModeModal.open((result) => {
           const mode = result.input;
-          if (!PatternModesList.includes(mode)) return false;
+          if (!ModeModal.validate(mode)) return false;
           this.pattern.setMode(mode);
           this.updateProps();
           return true;
@@ -226,15 +258,13 @@ export class PatternListRow {
         TrigModal.setValue(this.pattern.trigNote);
         TrigModal.open((result) => {
           const note = Number(result.input);
-          if (isNaN(note) || note < 1 || note > 127) return false;
+          if (!TrigModal.validate(note)) return false;
           this.pattern.setTrigNote(note);
           this.updateProps();
           return true;
         });
         break;
     }
-
-
 
   };
 
@@ -247,7 +277,7 @@ export class PatternListRow {
       let val = '';
       switch (col.name) {
         case 'ROW':
-          val = String(`${this.index}`).padEnd(2);
+          val = String(`${this.index + 1}`).padEnd(2);
           break;
         case 'ACTIVE':
           val = String(this.pattern.active ? 'ON' : 'OFF').padEnd(3);
@@ -265,7 +295,9 @@ export class PatternListRow {
           val = String(this.pattern.autoPlay ? 'PLAY' : 'WAIT').padEnd(4);
           break;
         case 'FILE':
-          val = String(this.pattern.file).padEnd(25);
+          const midiPath = absFromRoot('midi');
+          const relativePath = path.relative(midiPath, this.pattern.file);
+          val = relativePath.padEnd(30);
           break;
       }
       col.setContent(val);

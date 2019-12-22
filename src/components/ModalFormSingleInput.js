@@ -93,16 +93,29 @@ export class ModalFormSingleInput extends ModalForm {
     this.textbox.setValue(String(val));
   };
 
+  validate = (val) => {
+    switch (this.valueType) {
+      case 'number':
+        if (isNaN(val)) return false;
+        if (this.valueMin !== undefined && val < this.valueMin) return false;
+        if (this.valueMax !== undefined && val > this.valueMax) return false;
+        return true;
+
+      case 'options':
+        return this.valueOpts.includes(val);
+    }
+  };
+
   decrementValue = () => {
     const val = Number(this.textbox.value) - 1;
-    if (this.valueMin !== undefined && val < this.valueMin) return;
+    if (!this.validate(val)) return;
     this.setValue(val);
     this.rerender();
   };
 
   incrementValue = () => {
     const val = Number(this.textbox.value) + 1;
-    if (this.valueMax !== undefined && val > this.valueMax) return;
+    if (!this.validate(val)) return;
     this.setValue(val);
     this.rerender();
   };

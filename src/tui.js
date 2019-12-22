@@ -10,6 +10,7 @@ import { MainView } from './views/MainView';
 import { PatternList } from './components/PatternList';
 import { PatternListRow } from './components/PatternListRow';
 import { ModalFormSingleInput } from './components/ModalFormSingleInput';
+import {absFromRoot} from './utils/root';
 
 try { process.on('uncaughtException', log); } catch(e) { log(e) }
 
@@ -19,16 +20,12 @@ list.node.on('rerender', () => {
   MainView.screen.render();
 });
 
-list.node.on('openModal', () => {
-
-});
-
 list.addPattern(new Pattern({
   channel: 2,
   trigNote: 36,
   autoPlay: true,
   mode: PatternModes.LOOP,
-  file: 'example/zelda.mid',
+  file: absFromRoot('midi/example/zelda.mid'),
 }));
 
 list.addPattern(new Pattern({
@@ -36,32 +33,26 @@ list.addPattern(new Pattern({
   trigNote: 38,
   autoPlay: true,
   mode: PatternModes.LOOP,
-  file: 'drums/01.mid',
+  file: absFromRoot('midi/drums/01.mid'),
 }));
 
-const ChanModal = new ModalFormSingleInput({
-  label: 'Channel',
-  width: 5
-});
-
-const TrigModal = new ModalFormSingleInput({
-  label: 'Trigger',
-  width: 5
-});
-
 MainView.screen.key(['up'], () => {
+  if (MainView.isModalOpen) return;
   list.cursorUp();
 });
 
 MainView.screen.key(['down'], () => {
+  if (MainView.isModalOpen) return;
   list.cursorDown();
 });
 
 MainView.screen.key(['left', 'S-tab'], () => {
+  if (MainView.isModalOpen) return;
   list.cursorLeft();
 });
 
 MainView.screen.key(['right', 'tab'], () => {
+  if (MainView.isModalOpen) return;
   list.cursorRight();
 });
 

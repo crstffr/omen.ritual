@@ -8,10 +8,10 @@ import { PatternTypes } from './PatternTypes';
 
 export class Pattern {
 
-  constructor (opts) {
+  constructor (opts = {}) {
 
     const {
-      active    = true,
+      active    = false,
       autoPlay  = true,
       channel   = 1,
       file      = '',
@@ -84,7 +84,8 @@ export class Pattern {
    */
   loadFile = (file) => {
     if (!file) return;
-    this.player.loadFile(absFromRoot(path.join('midi', file)));
+    this.file = file;
+    this.player.loadFile(file);
   };
 
   /**

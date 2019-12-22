@@ -1,6 +1,7 @@
 import c from 'chalk';
 import blessed from 'blessed';
 import contrib from 'blessed-contrib';
+import { absFromRoot } from '../utils/root';
 import { log } from '../utils/log';
 
 export const MainView = new (class {
@@ -11,6 +12,9 @@ export const MainView = new (class {
   /** @type {BlessedContrib.grid} */
   grid;
 
+  /** @type {boolean} */
+  isModalOpen;
+
   /** @type {Widgets.Screen} */
   screen;
 
@@ -19,6 +23,7 @@ export const MainView = new (class {
     this.screen = blessed.screen({
       smartCSR: true,
       autoPadding: true,
+      warnings: true
     });
 
     this.grid = new contrib.grid({
@@ -84,27 +89,9 @@ export const MainView = new (class {
   openModal = (modal, onSubmit, onCancel) => {
     this.screen.saveFocus();
     this.node.append(modal.node);
-
-    /*
-    const closeModal = this.closeModal.bind(null, modal);
-
-    modal.form.on('cancel', (data) => {
-      if (typeof onCancel === 'function') {
-        if (!onCancel(data)) return;
-      }
-      closeModal();
-    });
-
-    modal.form.on('submit', (data) => {
-      if (typeof onSubmit === 'function') {
-        if (!onSubmit(data)) return;
-      }
-      closeModal();
-    });
-    */
-
     this.screen.render();
     modal.node.emit('opened');
+    this.isModalOpen = true;
   };
 
   closeModal = (modal) => {
@@ -112,6 +99,7 @@ export const MainView = new (class {
     modal.form.removeAllListeners();
     this.screen.restoreFocus();
     this.screen.render();
+    this.isModalOpen = false;
   }
 
 })();
