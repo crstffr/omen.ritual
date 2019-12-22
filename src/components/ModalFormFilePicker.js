@@ -100,7 +100,7 @@ export class ModalFormFilePicker extends ModalForm {
     this.picker.refresh(dir, () => {
       this.picker.items.forEach((item, i) => {
         if (item.content === base) {
-          this.picker.select(i + 1);
+          this.picker.select(i);
           this.rerender();
         }
       });
@@ -110,7 +110,6 @@ export class ModalFormFilePicker extends ModalForm {
   validate = (val) => {
     const {ext} = path.parse(val);
     if (this.validFileExts.length === 0) return true;
-    log('validate', ext, this.validFileExts);
     return this.validFileExts.includes(ext);
   };
 

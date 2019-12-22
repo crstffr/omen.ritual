@@ -1,9 +1,9 @@
 /**
- * Enum for Track Types
+ * Enum for Pattern Types
  *
  * @readonly
- * @typedef {number} TrackType
- * @enum {TrackType}
+ * @typedef {number} PatternType
+ * @enum {PatternType}
  */
 export const PatternTypes = {
 

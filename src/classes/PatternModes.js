@@ -2,8 +2,8 @@
  * Enum for Track Modes
  *
  * @readonly
- * @typedef {string} TrackMode
- * @enum {TrackMode}
+ * @typedef {string} PatternMode
+ * @enum {PatternMode}
  */
 export const PatternModes = {
 
@@ -21,7 +21,7 @@ export const PatternModes = {
 
 /**
  *
- * @type {(PatternModes|TrackMode)[]}
+ * @type {(PatternModes|PatternMode)[]}
  */
 export const PatternModesList = [
   PatternModes.LOOP,

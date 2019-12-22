@@ -1,23 +1,32 @@
 import { MidiIO } from './LocalMidi';
+import { Pattern } from './Pattern';
+import { EventEmitter } from 'events';
+import { log } from '../utils/log';
 
+export class Song extends EventEmitter {
 
-export class Song {
+  /** @type {function[]} */
+  watchers = [];
 
   constructor (opts) {
+    super();
 
     const {
+      name    = 'song-name',
       channel = 16,
-      io      = {},
     } = opts;
 
     /** @type {number} */
     this.channel = channel;
 
+    /** @type {SongOpts} */
+    this.opts = opts;
+
     /** @type {Pattern[]} */
     this.patterns = [];
 
     /** @type {string} */
-    this.name = 'song-name';
+    this.name = name;
 
     MidiIO.onMessage((msg) => {
       if (msg.type === 'Start') return this.play();
@@ -29,10 +38,44 @@ export class Song {
 
   /**
    *
-   * @param {Pattern} pattern
+   * @param {PatternOpts} [patternOpts]
    */
-  addPattern = (pattern) => {
+  addPattern = (patternOpts) => {
+    const pattern = new Pattern(patternOpts);
+    pattern.setIndex(this.patterns.length);
+
+    if (!pattern.trigNote) {
+      const note = this.getNextTrigNote();
+      pattern.setTrigNote(note);
+    }
+
     this.patterns.push(pattern);
+    this.emit('updated');
+    return pattern;
+  };
+
+  removePattern = (which) => {
+    this.patterns = this.patterns.filter((_, i) => (which !== i));
+    this.emit('updated');
+  };
+
+  getNextTrigNote = () => {
+    const notes = this.patterns.map(({trigNote}) => trigNote);
+    for (let i = 36; i <= 127; i = i + 2) {
+      if (!notes.includes(i)) return i;
+    }
+    return 34;
+  };
+
+  /**
+   *
+   * @returns {{opts: SongOpts, patterns: PatternOpts[]}}
+   */
+  exportData = () => {
+    return {
+      opts: this.opts,
+      patterns: this.patterns.map(pattern => pattern.opts)
+    }
   };
 
   /**

@@ -6,10 +6,11 @@ import { clone } from '../utils/clone';
 import { log } from '../utils/log';
 import { uid } from '../utils/uid';
 
+import { MainView } from '../views/MainView';
 import { PatternModesList } from '../classes/PatternModes';
 import { ModalFormSingleInput } from './ModalFormSingleInput';
-import {ModalFormFilePicker} from './ModalFormFilePicker';
-import {absFromRoot} from '../utils/root';
+import { ModalFormFilePicker } from './ModalFormFilePicker';
+import { absFromRoot } from '../utils/root';
 
 const ChanModal = new ModalFormSingleInput({
   label: 'Channel',
@@ -167,19 +168,31 @@ export class PatternListRow {
         button.key(['i'], this.rowInsert);
         button.key(['enter'], () => this.editProp('FILE'));
         button.key(['a'], () => this.editProp('ACTIVE'));
+        button.key(['c'], () => this.editProp('CHAN'));
+        button.key(['m'], () => this.editProp('MODE'));
         button.key(['p'], () => this.editProp('AUTO'));
+        button.key(['t'], () => this.editProp('TRIG'));
       }
 
     });
 
   }
 
+  destroy = () => {
+    this.cols.forEach(col => col.destroy());
+    this.node.destroy();
+  };
+
+  render = () => {
+    MainView.screen.render();
+  };
+
   rowFocus = () => {
     this.node.style.bg = 'gray';
     this.cols.forEach(col => {
       col.style.bg = 'gray';
     });
-    this.rerender();
+    this.render();
   };
 
   rowBlur = () => {
@@ -187,7 +200,7 @@ export class PatternListRow {
     this.cols.forEach(col => {
       col.style.bg = 'normal';
     });
-    this.rerender();
+    this.render();
   };
 
   rowDelete = () => {
@@ -268,10 +281,6 @@ export class PatternListRow {
 
   };
 
-  rerender = () => {
-    this.node.emit('rerender');
-  };
-
   updateProps = () => {
     this.cols.forEach((col) => {
       let val = '';
@@ -297,12 +306,13 @@ export class PatternListRow {
         case 'FILE':
           const midiPath = absFromRoot('midi');
           const relativePath = path.relative(midiPath, this.pattern.file);
-          val = relativePath.padEnd(30);
+          val = relativePath.slice(0, 30).padEnd(30);
           break;
       }
       col.setContent(val);
     });
-    this.rerender();
+
+    this.render();
   }
 
 }

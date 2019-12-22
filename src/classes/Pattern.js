@@ -1,6 +1,8 @@
 import path from 'path';
 import { Player } from 'midi-player-js';
 import { MidiIO } from './LocalMidi';
+
+import { log } from '../utils/log';
 import { absFromRoot } from '../utils/root';
 
 import { PatternModes } from './PatternModes';
@@ -8,70 +10,101 @@ import { PatternTypes } from './PatternTypes';
 
 export class Pattern {
 
+  //
+  // Options / Props
+  //
+
+  /** @type {boolean} */
+  active;
+
+  /** @type {boolean} */
+  autoPlay;
+
+  /** @type {number} */
+  channel;
+
+  /** @type {string} */
+  file;
+
+  /** @type {number} */
+  index;
+
+  /** @type {PatternMode} */
+  mode;
+
+  /** @type {PatternOpts} */
+  opts;
+
+  /** @type {number} */
+  padEnd;
+
+  /** @type {number} */
+  padStart;
+
+  /** @type {number} */
+  tempo;
+
+  /** @type {number} */
+  transpose;
+
+  /** @type {number} */
+  trigNote;
+
+  /** @type {PatternType} */
+  type;
+
+  //
+  // State
+  //
+
+  /** @type {boolean} */
+  isPlaying;
+
+  /** @type {*} */
+  openNotes;
+
+  //
+  // Instances
+  //
+
+  /** @type {module:midi-player-js.MidiInternal.Player} */
+  player;
+
+  /**
+   *
+   * @param {PatternOpts|{}} opts
+   */
   constructor (opts = {}) {
 
     const {
       active    = false,
-      autoPlay  = true,
+      autoPlay  = false,
       channel   = 1,
       file      = '',
       mode      = PatternModes.LOOP,
       padEnd    = 0,
       padStart  = 0,
       tempo     = 0,
-      trigNote  = 0,
       transpose = 0,
+      trigNote  = 0,
       type      = PatternTypes.KEYS,
     } = opts;
 
-    /** @type {boolean} */
     this.active = active;
-
-    /** @type {boolean} */
     this.autoPlay = autoPlay;
-
-    /** @type {number} */
     this.channel = channel;
-
-    /** @type {string} */
     this.file = file;
-
-    /** @type {TrackMode} */
     this.mode = mode;
-
-    /** @type {number} */
+    this.opts = opts;
     this.padEnd = padEnd;
-
-    /** @type {number} */
     this.padStart = padStart;
-
-    /** @type {number} */
     this.tempo = tempo;
-
-    /** @type {number} */
-    this.trigNote = trigNote;
-
-    /** @type {number} */
     this.transpose = transpose;
-
-    /** @type {TrackType} */
+    this.trigNote = trigNote;
     this.type = type;
-
-    //
-    // Below are state
-    //
-
-    /** @type {boolean} */
     this.isPlaying = false;
-
-    /** @type {*} */
     this.openNotes = {};
 
-    //
-    // Below are instantiations
-    //
-
-    /** @type {module:midi-player-js.MidiInternal.Player} */
     this.player = new Player(this.onPatternEvents);
     this.player.on('endOfFile', this.onPatternEnd);
     this.player.sampleRate = 0;
@@ -84,8 +117,13 @@ export class Pattern {
    */
   loadFile = (file) => {
     if (!file) return;
-    this.file = file;
-    this.player.loadFile(file);
+    try {
+      this.file = file;
+      this.player.loadFile(file);
+    } catch (e) {
+      log(e);
+      this.file = '';
+    }
   };
 
   /**
@@ -110,7 +148,14 @@ export class Pattern {
   };
 
   /**
-   * @param {TrackMode} mode
+   * @param {number} index
+   */
+  setIndex = (index) => {
+    this.index = index;
+  };
+
+  /**
+   * @param {PatternMode} mode
    */
   setMode = (mode) => {
     this.mode = mode;
@@ -132,7 +177,7 @@ export class Pattern {
   };
 
   /**
-   * @param {TrackType} type
+   * @param {PatternType} type
    */
   setType = (type) => {
     this.type = type;

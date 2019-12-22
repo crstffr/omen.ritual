@@ -14,10 +14,10 @@ const MySong = new Song({
   channel: 14
 });
 
-MySong.addPattern(new Pattern({
+MySong.addPattern({
   channel: 2,
   trigNote: 36,
   autoPlay: true,
   mode: PatternModes.LOOP,
   file: 'midi/example/zelda.mid',
-}));
+});
