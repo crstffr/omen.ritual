@@ -110,14 +110,14 @@ export class ModalFormSingleInput extends ModalForm {
     const val = Number(this.textbox.value) - 1;
     if (!this.validate(val)) return;
     this.setValue(val);
-    this.rerender();
+    this.render();
   };
 
   incrementValue = () => {
     const val = Number(this.textbox.value) + 1;
     if (!this.validate(val)) return;
     this.setValue(val);
-    this.rerender();
+    this.render();
   };
 
   selectPrevOption = () => {
@@ -125,14 +125,14 @@ export class ModalFormSingleInput extends ModalForm {
     if (i === 0) i = this.valueOpts.length;
     if (i === -1) i = 1;
     this.setValue(this.valueOpts[--i]);
-    this.rerender();
+    this.render();
   };
 
   selectNextOption = () => {
     let i = this.valueOpts.indexOf(this.textbox.value);
     if (i === this.valueOpts.length - 1) i = -1;
     this.setValue(this.valueOpts[++i]);
-    this.rerender();
+    this.render();
   };
 
 

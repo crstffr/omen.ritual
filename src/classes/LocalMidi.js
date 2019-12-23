@@ -1,4 +1,5 @@
 import midi from 'midi';
+import { log } from '../utils/log';
 
 import {
   DecodeStream,
@@ -110,7 +111,8 @@ export class LocalMidi {
    * @returns {function} unwatch
    */
   onMessage = (cb) => {
-    return this.decoder.on('data', cb);
+    this.decoder.on('data', cb);
+    return () => this.decoder.removeListener('data', cb);
   };
 
   /**

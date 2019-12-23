@@ -61,22 +61,22 @@ export class ModalFormFilePicker extends ModalForm {
 
     this.picker.key(['home'], () => {
       this.picker.select(0);
-      this.rerender();
+      this.render();
     });
 
     this.picker.key(['end'], () => {
       this.picker.select(this.picker.items.length - 1);
-      this.rerender();
+      this.render();
     });
 
     this.picker.key(['pageup'], () => {
       this.picker.up(10);
-      this.rerender();
+      this.render();
     });
 
     this.picker.key(['pagedown'], () => {
       this.picker.down(10);
-      this.rerender();
+      this.render();
     });
 
     this.picker.on('cd', (dir) => {
@@ -90,7 +90,7 @@ export class ModalFormFilePicker extends ModalForm {
   gotoBaseDir = () => {
     this.picker.reset(this.baseDir, () => {
       this.picker.shiftItem();
-      this.rerender();
+      this.render();
     });
   };
 
@@ -101,7 +101,7 @@ export class ModalFormFilePicker extends ModalForm {
       this.picker.items.forEach((item, i) => {
         if (item.content === base) {
           this.picker.select(i);
-          this.rerender();
+          this.render();
         }
       });
     });

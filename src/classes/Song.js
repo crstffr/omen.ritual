@@ -5,24 +5,28 @@ import { log } from '../utils/log';
 
 export class Song extends EventEmitter {
 
-  constructor (opts) {
+  /** @type {number} */
+  channel;
+
+  /** @type {string} */
+  name;
+
+  /** @type {Pattern[]} */
+  patterns = [];
+
+  /**
+   *
+   * @param {SongOpts} [opts]
+   */
+  constructor (opts = {}) {
     super();
 
     const {
+      channel = 14,
       name    = 'untitled',
-      channel = 16,
     } = opts;
 
-    /** @type {number} */
     this.channel = channel;
-
-    /** @type {SongOpts} */
-    this.opts = opts;
-
-    /** @type {Pattern[]} */
-    this.patterns = [];
-
-    /** @type {string} */
     this.name = name;
 
     MidiIO.onMessage((msg) => {
@@ -31,6 +35,19 @@ export class Song extends EventEmitter {
       this.checkForTrigNotes(msg);
     });
 
+  }
+
+  /**
+   * Static method to instantiate new song from save data
+   *
+   * @param {SongExport} data
+   */
+  static load(data) {
+    const song = new Song(data.song);
+    data.patterns.forEach(patternOpts => {
+      song.addPattern(patternOpts);
+    });
+    return song;
   }
 
   /**
@@ -52,12 +69,20 @@ export class Song extends EventEmitter {
     return pattern;
   };
 
-  removePattern = (which) => {
-    this.patterns = this.patterns.filter((_, i) => (which !== i));
+  /**
+   *
+   * @param {number} index
+   */
+  removePattern = (index) => {
+    this.patterns = this.patterns.filter((_, i) => (index !== i));
     this.emit('updated');
     this.emit('touched');
   };
 
+  /**
+   *
+   * @returns {number}
+   */
   getNextTrigNote = () => {
     const notes = this.patterns.map(({trigNote}) => trigNote);
     for (let i = 36; i <= 127; i = i + 2) {
@@ -68,12 +93,15 @@ export class Song extends EventEmitter {
 
   /**
    *
-   * @returns {{song: SongOpts, patterns: PatternOpts[]}}
+   * @returns {SongSaveData}
    */
   exportData = () => {
     return {
-      song: this.opts,
-      patterns: this.patterns.map(pattern => pattern.exportData())
+      song: {
+        channel: this.channel,
+        name: this.name
+      },
+      patterns: this.patterns.map(p => p.exportData())
     }
   };
 

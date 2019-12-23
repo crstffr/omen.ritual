@@ -12,36 +12,15 @@ import { ModalFormSingleInput } from './ModalFormSingleInput';
 import { ModalFormFilePicker } from './ModalFormFilePicker';
 import { absFromRoot } from '../utils/root';
 
-const ChanModal = new ModalFormSingleInput({
-  label: 'Channel',
-  valueType: 'number',
-  valueMax: 16,
-  valueMin: 1,
-  inputWidth: 3
-});
-
-const ModeModal = new ModalFormSingleInput({
-  label: 'Mode',
-  valueType: 'options',
-  valueOpts: PatternModesList,
-  inputWidth: 5
-});
-
-const TrigModal = new ModalFormSingleInput({
-  label: 'Trigger',
-  valueType: 'number',
-  valueMax: 127,
-  valueMin: 0,
-  inputWidth: 4
-});
-
-const FileModal = new ModalFormFilePicker({
-  label: 'File',
-  baseDir: absFromRoot('/midi'),
-  validFileExts: ['.mid', '.midi']
-});
+import { PatternChanModal } from '../modals/PatternChanModal';
+import { PatternFileModal } from '../modals/PatternFileModal';
+import { PatternModeModal } from '../modals/PatternModeModal';
+import { PatternTrigModal } from '../modals/PatternTrigModal';
 
 export class PatternListRow {
+
+  /** @type {Widgets.ButtonElement[]} */
+  cols;
 
   /** @type {number} */
   index;
@@ -55,19 +34,21 @@ export class PatternListRow {
   /** @type {Pattern} */
   pattern;
 
-  /** @type {Widgets.ButtonElement[]} */
-  cols;
+  /** @type {Song} */
+  song;
 
   /**
    *
+   * @param {Song} song
    * @param {Pattern} pattern
    * @param {number} index
    */
-  constructor (pattern, index = 0) {
+  constructor (song, pattern, index = 0) {
 
     this.id = uid();
     this.index = index;
     this.pattern = pattern || {};
+    this.song = song || {};
 
     this.node = blessed.box({
       keys: true,
@@ -231,10 +212,10 @@ export class PatternListRow {
         break;
 
       case 'CHAN':
-        ChanModal.setValue(this.pattern.channel);
-        ChanModal.open((result) => {
+        PatternChanModal.setValue(this.pattern.channel);
+        PatternChanModal.open((result) => {
           const chan = Number(result.input);
-          if (!ChanModal.validate(chan)) return false;
+          if (!PatternChanModal.validate(chan)) return false;
           this.pattern.setChannel(chan);
           this.updateProps();
           return true;
@@ -242,10 +223,10 @@ export class PatternListRow {
         break;
 
       case 'FILE':
-        FileModal.setValue(this.pattern.file);
-        FileModal.open((result) => {
+        PatternFileModal.setValue(this.pattern.file);
+        PatternFileModal.open((result) => {
           const file = result.input;
-          if (!FileModal.validate(file)) return false;
+          if (!PatternFileModal.validate(file)) return false;
           this.pattern.loadFile(file);
           this.updateProps();
           return true;
@@ -253,10 +234,10 @@ export class PatternListRow {
         break;
 
       case 'MODE':
-        ModeModal.setValue(this.pattern.mode);
-        ModeModal.open((result) => {
+        PatternModeModal.setValue(this.pattern.mode);
+        PatternModeModal.open((result) => {
           const mode = result.input;
-          if (!ModeModal.validate(mode)) return false;
+          if (!PatternModeModal.validate(mode)) return false;
           this.pattern.setMode(mode);
           this.updateProps();
           return true;
@@ -264,10 +245,12 @@ export class PatternListRow {
         break;
 
       case 'TRIG':
-        TrigModal.setValue(this.pattern.trigNote);
-        TrigModal.open((result) => {
+        PatternTrigModal.setValue(this.pattern.trigNote);
+        PatternTrigModal.startListeningForMidi(this.song.channel);
+        PatternTrigModal.open((result) => {
           const note = Number(result.input);
-          if (!TrigModal.validate(note)) return false;
+          if (!PatternTrigModal.validate(note)) return false;
+          PatternTrigModal.stopListeningForMidi();
           this.pattern.setTrigNote(note);
           this.updateProps();
           return true;

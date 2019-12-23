@@ -1,5 +1,5 @@
 
-export class PatternListOpts {
+class PatternListOpts {
   
   /** @type {Song} */
   song;

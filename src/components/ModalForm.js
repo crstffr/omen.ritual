@@ -5,6 +5,9 @@ import { MainView } from '../views/MainView';
 
 export class ModalForm {
 
+  /** @type {boolean} */
+  isOpen = false;
+
   /** @type {Widgets.BoxElement} */
   node;
 
@@ -30,8 +33,6 @@ export class ModalForm {
 
     this.node.on('opened', () => this.focus());
 
-    this.node.on('rerender', () => this.rerender());
-
     this.form = blessed.form({
       parent: this.node,
       keys: true,
@@ -55,7 +56,7 @@ export class ModalForm {
 
   }
 
-  rerender = () => {
+  render = () => {
     MainView.screen.render();
   };
 

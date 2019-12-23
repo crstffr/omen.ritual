@@ -1,5 +1,5 @@
 
-class SongExport {
+class SongSaveData {
 
   /** @type {SongOpts} */
   song;

@@ -33,9 +33,6 @@ export class Pattern extends EventEmitter {
   /** @type {PatternMode} */
   mode;
 
-  /** @type {PatternOpts} */
-  opts;
-
   /** @type {number} */
   padEnd;
 
@@ -59,10 +56,10 @@ export class Pattern extends EventEmitter {
   //
 
   /** @type {boolean} */
-  isPlaying;
+  isPlaying = false;
 
   /** @type {*} */
-  openNotes;
+  openNotes = {};
 
   //
   // Instances
@@ -80,7 +77,7 @@ export class Pattern extends EventEmitter {
     super();
 
     const {
-      active    = false,
+      active    = true,
       autoPlay  = false,
       channel   = 1,
       file      = '',
@@ -98,15 +95,12 @@ export class Pattern extends EventEmitter {
     this.channel = channel;
     this.file = file;
     this.mode = mode;
-    this.opts = opts;
     this.padEnd = padEnd;
     this.padStart = padStart;
     this.tempo = tempo;
     this.transpose = transpose;
     this.trigNote = trigNote;
     this.type = type;
-    this.isPlaying = false;
-    this.openNotes = {};
 
     this.player = new Player(this.onPatternEvents);
     this.player.on('endOfFile', this.onPatternEnd);
@@ -115,34 +109,23 @@ export class Pattern extends EventEmitter {
     this.loadFile(this.file);
   }
 
-  exportData = () => {
-    const {
-      active,
-      autoPlay,
-      channel,
-      file,
-      mode,
-      padEnd,
-      padStart,
-      tempo,
-      transpose,
-      trigNote,
-      type
-    } = this;
-    return {
-      active,
-      autoPlay,
-      channel,
-      file,
-      mode,
-      padEnd,
-      padStart,
-      tempo,
-      transpose,
-      trigNote,
-      type
-    }
-  };
+  /**
+   *
+   * @returns {PatternOpts}
+   */
+  exportData = () => ({
+    active:     this.active,
+    autoPlay:   this.autoPlay,
+    channel:    this.channel,
+    file:       this.file,
+    mode:       this.mode,
+    padEnd:     this.padEnd,
+    padStart:   this.padStart,
+    tempo:      this.tempo,
+    transpose:  this.transpose,
+    trigNote:   this.trigNote,
+    type:       this.type
+  });
 
   /**
    * @param {string} val

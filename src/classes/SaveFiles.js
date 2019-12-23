@@ -15,13 +15,9 @@ if (!fs.pathExistsSync(lastPath)) fs.writeJsonSync(lastPath, {});
 export class SaveFiles {
 
   static getLastSong() {
-    const lastSong = fs.readJsonSync(lastPath);
-    if (!lastSong.file) return false;
-    try {
-      return fs.readJsonSync(lastSong.file);
-    } catch(e) {
-      return false;
-    }
+    const data = fs.readJsonSync(lastPath);
+    if (!data.file) return false;
+    return data.file;
   }
 
   static setLastSong(file) {
@@ -30,13 +26,35 @@ export class SaveFiles {
 
   /**
    *
+   * @returns {SongExport}
+   */
+  static loadLastSong() {
+    const song = SaveFiles.getLastSong();
+    if (!song) return null;
+    return SaveFiles.loadSong(song);
+  }
+
+  /**
+   *
+   * @param {string} file
+   * @returns {SongExport}
+   */
+  static loadSong(file) {
+    try {
+      return fs.readJsonSync(file);
+    } catch(e) {
+      return null;
+    }
+  }
+
+  /**
+   *
    * @param {Song} song
    */
   static saveSong(song) {
-    const name = song.opts.name;
+    const name = song.name;
     const data = song.exportData();
     const file = path.join(songsPath, name + '.json');
-    log(data);
     fs.writeJsonSync(file, data, {spaces: 2});
     SaveFiles.setLastSong(file);
   }

@@ -20,43 +20,22 @@ try { process.on('uncaughtException', log); } catch(e) { log(e) }
 if (!MidiIO.connect({
   input:  'MIDI4x4 Midi In 1',
   output: 'MIDI4x4 Midi Out 1'
-})) process.exit(1);
+})) { console.log('UNABLE TO CONNECT'); process.exit(1); }
 
-const MySong = new Song({
-  channel: 14,
-  name: 'mysong'
-});
+const savedSong = SaveFiles.loadLastSong();
 
-MySong.on('touched', () => {
+const song = (savedSong)
+  ? Song.load(savedSong)
+  : new Song();
+
+song.on('touched', () => {
   MainView.setTitleDirty();
 });
 
-const list = new PatternList({
-  song: MySong
-});
-
-list.node.on('rerender', () => {
-  MainView.render();
-});
-
-MySong.addPattern({
-  channel: 2,
-  trigNote: 36,
-  autoPlay: true,
-  mode: PatternModes.LOOP,
-  file: absFromRoot('midi/songs/chopin.mid'),
-});
-
-MySong.addPattern({
-  channel: 1,
-  trigNote: 38,
-  autoPlay: true,
-  mode: PatternModes.LOOP,
-  file: absFromRoot('midi/drums/01.mid'),
-});
+const list = new PatternList({song});
 
 MainView.screen.key(['C-s'], () => {
-  SaveFiles.saveSong(MySong);
+  SaveFiles.saveSong(song);
   MainView.setTitleClean();
 });
 
@@ -80,6 +59,11 @@ MainView.screen.key(['right', 'tab'], () => {
   list.cursorRight();
 });
 
+MainView.screen.key(['C-space'], () => {
+
+});
+
 MainView.append(list.node);
 
 MainView.screen.key(['C-q'], () => process.exit(2));
+

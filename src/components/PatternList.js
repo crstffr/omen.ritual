@@ -57,6 +57,8 @@ export class PatternList {
       this.rows[0].colFocus(0);
     });
 
+    this.drawPatternRows();
+
   }
 
   drawPatternRows = () => {
@@ -76,7 +78,7 @@ export class PatternList {
    */
   createRowFromPattern = (pattern, i) => {
 
-    const row = new PatternListRow(pattern, i);
+    const row = new PatternListRow(this.song, pattern, i);
 
     this.rows.push(row);
     row.node.top = this.rows.length;

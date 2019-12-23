@@ -1,5 +1,5 @@
 
-export class SongOpts {
+class SongOpts {
 
   /** @type {number} */
   channel;

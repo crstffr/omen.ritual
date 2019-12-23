@@ -1,7 +1,5 @@
-import {PatternModes} from '../classes/PatternModes';
-import {PatternTypes} from '../classes/PatternTypes';
 
-export class PatternOpts {
+class PatternOpts {
 
   /** @type {boolean} */
   active;
@@ -28,10 +26,10 @@ export class PatternOpts {
   tempo;
 
   /** @type {number} */
-  trigNote;
+  transpose;
 
   /** @type {number} */
-  transpose;
+  trigNote;
 
   /** @type {PatternType} */
   type;
