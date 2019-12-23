@@ -1,4 +1,5 @@
 import path from 'path';
+import {EventEmitter} from 'events';
 import { Player } from 'midi-player-js';
 import { MidiIO } from './LocalMidi';
 
@@ -8,7 +9,7 @@ import { absFromRoot } from '../utils/root';
 import { PatternModes } from './PatternModes';
 import { PatternTypes } from './PatternTypes';
 
-export class Pattern {
+export class Pattern extends EventEmitter {
 
   //
   // Options / Props
@@ -76,6 +77,8 @@ export class Pattern {
    */
   constructor (opts = {}) {
 
+    super();
+
     const {
       active    = false,
       autoPlay  = false,
@@ -112,14 +115,44 @@ export class Pattern {
     this.loadFile(this.file);
   }
 
+  exportData = () => {
+    const {
+      active,
+      autoPlay,
+      channel,
+      file,
+      mode,
+      padEnd,
+      padStart,
+      tempo,
+      transpose,
+      trigNote,
+      type
+    } = this;
+    return {
+      active,
+      autoPlay,
+      channel,
+      file,
+      mode,
+      padEnd,
+      padStart,
+      tempo,
+      transpose,
+      trigNote,
+      type
+    }
+  };
+
   /**
-   * @param {string} file
+   * @param {string} val
    */
-  loadFile = (file) => {
-    if (!file) return;
+  loadFile = (val) => {
+    if (!val) return;
+    if (val !== this.file) this.touch();
     try {
-      this.file = file;
-      this.player.loadFile(file);
+      this.file = val;
+      this.player.loadFile(this.file);
     } catch (e) {
       log(e);
       this.file = '';
@@ -127,60 +160,66 @@ export class Pattern {
   };
 
   /**
-   * @param {boolean} autoPlay
+   * @param {boolean} val
    */
-  setAutoPlay = (autoPlay) => {
-    this.autoPlay = autoPlay;
+  setAutoPlay = (val) => {
+    if (val !== this.autoPlay) this.touch();
+    this.autoPlay = val;
   };
 
   /**
-   * @param {boolean} active
+   * @param {boolean} val
    */
-  setActive = (active) => {
-    this.active = active;
+  setActive = (val) => {
+    if (val !== this.active) this.touch();
+    this.active = val;
   };
 
   /**
-   * @param {number} channel
+   * @param {number} val
    */
-  setChannel = (channel) => {
-    this.channel = channel;
+  setChannel = (val) => {
+    if (val !== this.channel) this.touch();
+    this.channel = val;
   };
 
   /**
-   * @param {number} index
+   * @param {number} val
    */
-  setIndex = (index) => {
-    this.index = index;
+  setIndex = (val) => {
+    this.index = val;
   };
 
   /**
-   * @param {PatternMode} mode
+   * @param {PatternMode} val
    */
-  setMode = (mode) => {
-    this.mode = mode;
+  setMode = (val) => {
+    if (val !== this.mode) this.touch();
+    this.mode = val;
   };
 
   /**
-   * @param {number} tempo
+   * @param {number} val
    */
-  setTempo = (tempo) => {
-    this.tempo = tempo;
-    this.player.setTempo(tempo);
+  setTempo = (val) => {
+    this.tempo = val;
+    this.player.setTempo(val);
   };
 
   /**
-   * @param {number} trigNote
+   * @param {number} val
    */
-  setTrigNote = (trigNote) => {
-    this.trigNote = trigNote;
+  setTrigNote = (val) => {
+    if (val !== this.trigNote) this.touch();
+    this.trigNote = val;
   };
 
   /**
-   * @param {PatternType} type
+   * @param {PatternType} val
    */
-  setType = (type) => {
-    this.type = type;
+  setType = (val) => {
+    if (val !== this.type) this.touch();
+    this.type = val;
   };
 
   /**
@@ -226,6 +265,13 @@ export class Pattern {
     this.resetPlayer();
     this.setTempo(MidiIO.clockTempo);
 
+  };
+
+  /**
+   *
+   */
+  touch = () => {
+    this.emit('touched');
   };
 
   /**

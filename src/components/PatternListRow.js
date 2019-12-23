@@ -158,7 +158,7 @@ export class PatternListRow {
 
       button.key(['escape'], () => {
         if (button.name === 'ROW') return;
-        this.node.emit('selectRow');
+        this.node.emit('selectPattern', this.index);
       });
 
       if (button.name === 'ROW') {
@@ -204,11 +204,11 @@ export class PatternListRow {
   };
 
   rowDelete = () => {
-    this.node.emit('deleteRow', this.index);
+    this.node.emit('removePattern', this.index);
   };
 
   rowInsert = () => {
-    this.node.emit('insertRow', this.index);
+    this.node.emit('insertPattern', this.index);
   };
 
   colFocus = (col) => {
@@ -245,11 +245,7 @@ export class PatternListRow {
         FileModal.setValue(this.pattern.file);
         FileModal.open((result) => {
           const file = result.input;
-          log('submit', file);
-          if (!FileModal.validate(file)) {
-            log('invalid', file);
-            return false;
-          }
+          if (!FileModal.validate(file)) return false;
           this.pattern.loadFile(file);
           this.updateProps();
           return true;

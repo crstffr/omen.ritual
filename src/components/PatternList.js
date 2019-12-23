@@ -60,18 +60,13 @@ export class PatternList {
   }
 
   drawPatternRows = () => {
-
-    this.rows.forEach((row, i) => {
-      row.destroy();
-      delete row[i];
-    });
-
+    // Destroy all rows and empty the array
+    this.rows.forEach(row => row.destroy());
     this.rows.length = 0;
 
-    this.song.patterns.forEach(this.renderPatternRow);
-
+    // Create all the rows from scratch
+    this.song.patterns.forEach(this.createRowFromPattern);
     this.render();
-
   };
 
   /**
@@ -79,66 +74,36 @@ export class PatternList {
    * @param {Pattern} pattern
    * @param {number} i
    */
-  renderPatternRow = (pattern, i) => {
+  createRowFromPattern = (pattern, i) => {
 
     const row = new PatternListRow(pattern, i);
 
     this.rows.push(row);
     row.node.top = this.rows.length;
 
-    row.node.on('selectRow', () => {
-      this.rows[this.focusedRow].colFocus(0);
-      this.focusedCol = 0;
-    });
-
-    row.node.on('deleteRow', (i) => this.removePattern(i));
-    row.node.on('insertRow', (i) => this.insertPattern(i));
+    row.node.on('selectPattern', (i) => this.selectPattern(i));
+    row.node.on('removePattern', (i) => this.removePattern(i));
+    row.node.on('insertPattern', (i) => this.insertPattern(i));
 
     // attach the row to the list box
     this.node.append(row.node);
 
   };
 
-  /**
-   *
-   * @param {Pattern} pattern
-   * @returns {PatternListRow}
-   */
-  addPattern(pattern) {
-
-    const index = this.rows.length;
-    const row = new PatternListRow(pattern, index);
-
-    this.rows.push(row);
-    row.node.top = this.rows.length;
-    
-    row.node.on('selectRow', () => {
-      this.rows[this.focusedRow].colFocus(0);
-      this.focusedCol = 0;
-    });
-
-    row.node.on('deleteRow', (i) => this.removePattern(i));
-    row.node.on('insertRow', (i) => this.insertPattern(i));
-
-    // attach the row to the list box
-    this.node.append(row.node);
-
-    return row;
-  }
-
-  removePattern(i) {
+  removePattern = (i) => {
     this.song.removePattern(i);
     if (this.song.patterns.length === 0) {
       this.insertPattern();
       return;
     }
-    this.selectPattern(i > 0 ? i - 1 : 0);
-  }
+    const len = this.song.patterns.length;
+    this.selectPattern(i < len ? i : len - 1);
+  };
 
-  insertPattern() {
+  insertPattern = (i) => {
     const pattern = this.song.addPattern();
     this.selectPattern(pattern.index);
-  }
+  };
 
   selectPattern = (i) => {
     this.focusedRow = i;

@@ -2,7 +2,7 @@
 export class SongExport {
 
   /** @type {SongOpts} */
-  opts;
+  song;
 
   /** @type {PatternOpts[]} */
   patterns;

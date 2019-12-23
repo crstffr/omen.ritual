@@ -33,7 +33,6 @@ export const MainView = new (class {
     });
 
     this.node = this.grid.set(0, 0, 12, 12, blessed.box, {
-      label: c.green(' OMEN RITUAL '),
       padding: {
         left: 0,
         right: 0,
@@ -48,7 +47,18 @@ export const MainView = new (class {
       }
     });
 
+    this.setTitleClean();
   }
+
+  setTitleClean = () => {
+    this.node.setLabel(c.green(' OMEN RITUAL '));
+    this.render();
+  };
+
+  setTitleDirty = () => {
+    this.node.setLabel(c.red(' OMEN RITUAL '));
+    this.render();
+  };
 
   clear = () => {
     this.node.children.forEach((child, i) => {
@@ -66,7 +76,7 @@ export const MainView = new (class {
     this.node.append(node);
     node.emit('shown');
     if (node.options.shouldFocus) node.focus();
-    this.screen.render();
+    this.render();
   };
 
   /**
@@ -76,8 +86,15 @@ export const MainView = new (class {
   append = (node) => {
     this.node.append(node);
     if (node.options.shouldFocus) node.focus();
-    this.screen.render();
+    this.render();
     node.emit('shown');
+  };
+
+  /**
+   *
+   */
+  render = () => {
+    this.screen.render();
   };
 
   /**
@@ -89,7 +106,7 @@ export const MainView = new (class {
   openModal = (modal, onSubmit, onCancel) => {
     this.screen.saveFocus();
     this.node.append(modal.node);
-    this.screen.render();
+    this.render();
     modal.node.emit('opened');
     this.isModalOpen = true;
   };
@@ -98,7 +115,7 @@ export const MainView = new (class {
     modal.node.destroy();
     modal.form.removeAllListeners();
     this.screen.restoreFocus();
-    this.screen.render();
+    this.render();
     this.isModalOpen = false;
   }
 

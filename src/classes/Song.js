@@ -5,14 +5,11 @@ import { log } from '../utils/log';
 
 export class Song extends EventEmitter {
 
-  /** @type {function[]} */
-  watchers = [];
-
   constructor (opts) {
     super();
 
     const {
-      name    = 'song-name',
+      name    = 'untitled',
       channel = 16,
     } = opts;
 
@@ -49,6 +46,7 @@ export class Song extends EventEmitter {
       pattern.setTrigNote(note);
     }
 
+    pattern.on('touched', () => this.emit('touched'));
     this.patterns.push(pattern);
     this.emit('updated');
     return pattern;
@@ -57,6 +55,7 @@ export class Song extends EventEmitter {
   removePattern = (which) => {
     this.patterns = this.patterns.filter((_, i) => (which !== i));
     this.emit('updated');
+    this.emit('touched');
   };
 
   getNextTrigNote = () => {
@@ -69,12 +68,12 @@ export class Song extends EventEmitter {
 
   /**
    *
-   * @returns {{opts: SongOpts, patterns: PatternOpts[]}}
+   * @returns {{song: SongOpts, patterns: PatternOpts[]}}
    */
   exportData = () => {
     return {
-      opts: this.opts,
-      patterns: this.patterns.map(pattern => pattern.opts)
+      song: this.opts,
+      patterns: this.patterns.map(pattern => pattern.exportData())
     }
   };
 

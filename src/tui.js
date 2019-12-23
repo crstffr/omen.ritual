@@ -22,10 +22,13 @@ if (!MidiIO.connect({
   output: 'MIDI4x4 Midi Out 1'
 })) process.exit(1);
 
-SaveFiles.getSaves();
-
 const MySong = new Song({
-  channel: 14
+  channel: 14,
+  name: 'mysong'
+});
+
+MySong.on('touched', () => {
+  MainView.setTitleDirty();
 });
 
 const list = new PatternList({
@@ -33,7 +36,7 @@ const list = new PatternList({
 });
 
 list.node.on('rerender', () => {
-  MainView.screen.render();
+  MainView.render();
 });
 
 MySong.addPattern({
@@ -50,6 +53,11 @@ MySong.addPattern({
   autoPlay: true,
   mode: PatternModes.LOOP,
   file: absFromRoot('midi/drums/01.mid'),
+});
+
+MainView.screen.key(['C-s'], () => {
+  SaveFiles.saveSong(MySong);
+  MainView.setTitleClean();
 });
 
 MainView.screen.key(['up'], () => {
