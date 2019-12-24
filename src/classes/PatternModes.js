@@ -11,6 +11,8 @@ export const PatternModes = {
 
   ONCE: 'ONCE',
 
+  GATE: 'GATE',
+
   STEP: 'STEP',
 
   TOGL: 'TOGL',
@@ -25,5 +27,6 @@ export const PatternModes = {
  */
 export const PatternModesList = [
   PatternModes.LOOP,
-  PatternModes.ONCE
+  PatternModes.ONCE,
+  PatternModes.GATE,
 ];

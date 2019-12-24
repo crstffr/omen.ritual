@@ -282,6 +282,10 @@ export class PatternListRow {
   };
 
   updateProps = () => {
+
+    const mainWidth = MainView.screen.width;
+    const fileWidth = mainWidth - 38;
+
     this.cols.forEach((col) => {
       let val = '';
       switch (col.name) {
@@ -309,7 +313,7 @@ export class PatternListRow {
         case 'FILE':
           const midiPath = absFromRoot('midi');
           const relativePath = path.relative(midiPath, this.pattern.file);
-          val = relativePath.slice(0, 30).padEnd(30);
+          val = relativePath.slice(0, fileWidth).padEnd(fileWidth);
           break;
       }
       col.setContent(val);

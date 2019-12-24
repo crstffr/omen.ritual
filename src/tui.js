@@ -26,9 +26,7 @@ if (!MidiIO.connect({
 
 const savedSong = SaveFiles.loadLastSong();
 
-const song = (savedSong)
-  ? Song.load(savedSong)
-  : new Song();
+const song = (savedSong) ? Song.load(savedSong) : new Song();
 
 Previewer.setSong(song);
 
@@ -36,6 +34,10 @@ const list = new PatternList({song});
 
 song.on('touched', () => {
   MainView.setTitleDirty();
+});
+
+MainView.screen.on('resize', () => {
+  list.drawPatternRows();
 });
 
 MainView.screen.key(['C-s'], () => {
