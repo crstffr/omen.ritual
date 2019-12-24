@@ -14,6 +14,7 @@ import { ModalFormFilePicker } from './ModalFormFilePicker';
 import { absFromRoot } from '../utils/root';
 
 import { PatternChanModal } from '../modals/PatternChanModal';
+import { PatternDescModal } from '../modals/PatternDescModal';
 import { PatternFileModal } from '../modals/PatternFileModal';
 import { PatternModeModal } from '../modals/PatternModeModal';
 import { PatternTrigModal } from '../modals/PatternTrigModal';
@@ -156,6 +157,7 @@ export class PatternListRow {
         button.key(['enter'], () => this.editProp('FILE'));
         button.key(['a'], () => this.editProp('ACTIVE'));
         button.key(['c'], () => this.editProp('CHAN'));
+        button.key(['d'], () => this.editProp('DESC'));
         button.key(['m'], () => this.editProp('MODE'));
         button.key(['p'], () => this.editProp('AUTO'));
         button.key(['t'], () => this.editProp('TRIG'));
@@ -243,6 +245,17 @@ export class PatternListRow {
         });
         break;
 
+      case 'DESC':
+        PatternDescModal.setValue(this.pattern.description);
+        PatternDescModal.open((result) => {
+          const desc = String(result.input);
+          if (!PatternDescModal.validate(desc)) return false;
+          this.pattern.setDescription(desc);
+          this.updateProps();
+          return true;
+        });
+        break;
+
       case 'FILE':
         PatternFileModal.setValue(this.pattern.file);
         PatternFileModal.open((result) => {
@@ -288,32 +301,48 @@ export class PatternListRow {
 
     this.cols.forEach((col) => {
       let val = '';
+
+      const {
+        active,
+        autoPlay,
+        channel,
+        description,
+        file,
+        isPlaying,
+        mode,
+        trigNote,
+      } = this.pattern;
+
       switch (col.name) {
         case 'ROW':
           const play = c.red('▶');
           const num = this.index + 1;
-          const str = this.pattern.isPlaying ? play : num;
+          const str = isPlaying ? play : num;
           val = String(str).padEnd(2);
           break;
         case 'ACTIVE':
-          val = String(this.pattern.active ? 'ON' : 'OFF').padEnd(3);
+          val = String(active ? 'ON' : 'OFF').padEnd(3);
           break;
         case 'CHAN':
-          val = String(this.pattern.channel).padStart(2, '0');
+          val = String(channel).padStart(2, '0');
           break;
         case 'MODE':
-          val = String(this.pattern.mode);
+          val = String(mode);
           break;
         case 'TRIG':
-          val = String(this.pattern.trigNote).padStart(3, '0');
+          val = String(trigNote).padStart(3, '0');
           break;
         case 'AUTO':
-          val = String(this.pattern.autoPlay ? 'PLAY' : 'WAIT').padEnd(4);
+          val = String(autoPlay ? 'PLAY' : 'WAIT').padEnd(4);
           break;
         case 'FILE':
-          const midiPath = absFromRoot('midi');
-          const relativePath = path.relative(midiPath, this.pattern.file);
-          val = relativePath.slice(0, fileWidth).padEnd(fileWidth);
+          if (description) {
+            val = description;
+          } else {
+            const midiPath = absFromRoot('midi');
+            val = path.relative(midiPath, file);
+          }
+          val = val.slice(0, fileWidth).padEnd(fileWidth);
           break;
       }
       col.setContent(val);

@@ -89,12 +89,18 @@ export class ModalFormSingleInput extends ModalForm {
 
   }
 
-  setValue = (val) => {
+  setValue = (val = '') => {
     this.textbox.setValue(String(val));
   };
 
   validate = (val) => {
     switch (this.valueType) {
+      case 'string':
+        val = String(val);
+        if (this.valueMin !== undefined && val.length < this.valueMin) return false;
+        if (this.valueMax !== undefined && val.length > this.valueMax) return false;
+        return true;
+
       case 'number':
         if (isNaN(val)) return false;
         if (this.valueMin !== undefined && val < this.valueMin) return false;

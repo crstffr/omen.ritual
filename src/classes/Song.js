@@ -50,8 +50,8 @@ export class Song extends EventEmitter {
    */
   static load(data) {
     const song = new Song(data.song);
-    data.patterns.forEach(patternOpts => {
-      song.addPattern(patternOpts);
+    data.patterns.forEach((patternOpts, i) => {
+      song.addPattern(patternOpts, i);
     });
     return song;
   }
@@ -59,10 +59,11 @@ export class Song extends EventEmitter {
   /**
    *
    * @param {PatternOpts} [patternOpts]
+   * @param {number} [position]
    */
-  addPattern = (patternOpts) => {
+  addPattern = (patternOpts, position = 0) => {
+
     const pattern = new Pattern(patternOpts);
-    pattern.setIndex(this.patterns.length);
 
     if (!pattern.trigNote) {
       const note = this.getNextTrigNote();
@@ -71,7 +72,12 @@ export class Song extends EventEmitter {
 
     pattern.setTempo(this.tempo);
     pattern.on('touched', () => this.emit('touched'));
+
+    const spliced = this.patterns.splice(position);
     this.patterns.push(pattern);
+    this.patterns = this.patterns.concat(spliced);
+    this.patterns.forEach((_, i) => this.patterns[i].setIndex(i));
+
     this.emit('updated');
     return pattern;
   };

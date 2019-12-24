@@ -48,6 +48,10 @@ MainView.screen.key(['C-s'], () => {
   MainView.setTitleClean();
 });
 
+MainView.screen.key(['S-space'], () => {
+  log('start?');
+});
+
 MainView.screen.key(['up'], () => {
   if (MainView.isModalOpen) return;
   list.cursorUp();

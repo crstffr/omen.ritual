@@ -104,14 +104,20 @@ export class PatternList {
     this.selectPattern(i < len ? i : len - 1);
   };
 
-  insertPattern = (i) => {
-    const copyPattern = this.getSelectedPattern();
-    const copyData = copyPattern.exportData();
-    const pattern = this.song.addPattern({
-      ...copyData,
+  /**
+   *
+   * @param {number} [position]
+   */
+  insertPattern = (position = 0) => {
+    let opts = {};
+    let copy = this.getSelectedPattern();
+    if (copy) opts = {
+      ...copy.exportData(),
+      trigNote: 0,
       file: '',
-      trigNote: 0
-    });
+    };
+
+    const pattern = this.song.addPattern(opts, position + 1);
     this.selectPattern(pattern.index);
   };
 

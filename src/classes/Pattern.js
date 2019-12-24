@@ -25,6 +25,9 @@ export class Pattern extends EventEmitter {
   channel;
 
   /** @type {string} */
+  description;
+
+  /** @type {string} */
   file;
 
   /** @type {number} */
@@ -80,22 +83,24 @@ export class Pattern extends EventEmitter {
     super();
 
     const {
-      active    = true,
-      autoPlay  = false,
-      channel   = 1,
-      file      = '',
-      mode      = PatternModes.LOOP,
-      padEnd    = 0,
-      padStart  = 0,
-      tempo     = 0,
-      transpose = 0,
-      trigNote  = 0,
-      type      = PatternTypes.KEYS,
+      active      = true,
+      autoPlay    = false,
+      channel     = 1,
+      description = '',
+      file        = '',
+      mode        = PatternModes.LOOP,
+      padEnd      = 0,
+      padStart    = 0,
+      tempo       = 0,
+      transpose   = 0,
+      trigNote    = 0,
+      type        = PatternTypes.KEYS,
     } = opts;
 
     this.active = active;
     this.autoPlay = autoPlay;
     this.channel = channel;
+    this.description = description;
     this.file = file;
     this.mode = mode;
     this.padEnd = padEnd;
@@ -128,6 +133,7 @@ export class Pattern extends EventEmitter {
     active:     this.active,
     autoPlay:   this.autoPlay,
     channel:    this.channel,
+    description:this.description,
     file:       this.file,
     mode:       this.mode,
     padEnd:     this.padEnd,
@@ -177,6 +183,14 @@ export class Pattern extends EventEmitter {
   setChannel = (val) => {
     if (val !== this.channel) this.touch();
     this.channel = val;
+  };
+
+  /**
+   * @param {number} val
+   */
+  setDescription = (val) => {
+    if (val !== this.description) this.touch();
+    this.description = val;
   };
 
   /**
