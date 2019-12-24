@@ -23,6 +23,6 @@ PatternFileModal.form.on('cancel', () => {
   Events.emit('previewStop');
 });
 
-PatternFileModal.picker.on('file', () => {
+PatternFileModal.form.on('submit', () => {
   Events.emit('previewStop');
 });

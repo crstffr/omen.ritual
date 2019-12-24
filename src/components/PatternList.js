@@ -105,7 +105,13 @@ export class PatternList {
   };
 
   insertPattern = (i) => {
-    const pattern = this.song.addPattern();
+    const copyPattern = this.getSelectedPattern();
+    const copyData = copyPattern.exportData();
+    const pattern = this.song.addPattern({
+      ...copyData,
+      file: '',
+      trigNote: 0
+    });
     this.selectPattern(pattern.index);
   };
 
