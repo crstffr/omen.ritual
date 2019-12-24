@@ -6,6 +6,7 @@ import { clone } from '../utils/clone';
 import { log } from '../utils/log';
 import { uid } from '../utils/uid';
 
+import { Events } from '../classes/Events';
 import { MainView } from '../views/MainView';
 import { PatternModesList } from '../classes/PatternModes';
 import { ModalFormSingleInput } from './ModalFormSingleInput';
@@ -49,6 +50,9 @@ export class PatternListRow {
     this.index = index;
     this.pattern = pattern || {};
     this.song = song || {};
+
+    this.pattern.on('play', this.updateProps);
+    this.pattern.on('stop', this.updateProps);
 
     this.node = blessed.box({
       keys: true,
@@ -145,8 +149,10 @@ export class PatternListRow {
       if (button.name === 'ROW') {
         button.on('focus', this.rowFocus);
         button.on('blur', this.rowBlur);
-        button.key(['delete'], this.rowDelete);
         button.key(['i'], this.rowInsert);
+        button.key(['space'], this.patternPlay);
+        button.key(['escape'], this.patternStop);
+        button.key(['delete'], this.rowDelete);
         button.key(['enter'], () => this.editProp('FILE'));
         button.key(['a'], () => this.editProp('ACTIVE'));
         button.key(['c'], () => this.editProp('CHAN'));
@@ -160,12 +166,27 @@ export class PatternListRow {
   }
 
   destroy = () => {
+    this.pattern.removeListener('play', this.updateProps);
+    this.pattern.removeListener('stop', this.updateProps);
     this.cols.forEach(col => col.destroy());
     this.node.destroy();
   };
 
   render = () => {
     MainView.screen.render();
+  };
+
+  patternPlay = () => {
+    if (this.pattern.isPlaying) {
+      return this.patternStop();
+    }
+    this.pattern.play();
+    this.updateProps();
+  };
+
+  patternStop = () => {
+    this.pattern.stop();
+    this.updateProps();
   };
 
   rowFocus = () => {
@@ -265,7 +286,10 @@ export class PatternListRow {
       let val = '';
       switch (col.name) {
         case 'ROW':
-          val = String(`${this.index + 1}`).padEnd(2);
+          const play = c.red('▶');
+          const num = this.index + 1;
+          const str = this.pattern.isPlaying ? play : num;
+          val = String(str).padEnd(2);
           break;
         case 'ACTIVE':
           val = String(this.pattern.active ? 'ON' : 'OFF').padEnd(3);

@@ -4,6 +4,7 @@ import blessed from 'blessed';
 import contrib from 'blessed-contrib';
 
 import { MainView } from '../views/MainView';
+import { Events } from '../classes/Events';
 import { Pattern } from '../classes/Pattern';
 import { PatternListRow } from './PatternListRow';
 import { ModalFormSingleInput } from './ModalFormSingleInput';
@@ -55,6 +56,7 @@ export class PatternList {
     this.node.on('shown', () => {
       if (!this.rows[0]) return this.insertPattern();
       this.rows[0].colFocus(0);
+      this.emitPatternSelected();
     });
 
     this.drawPatternRows();
@@ -111,16 +113,30 @@ export class PatternList {
     this.focusedRow = i;
     this.focusedCol = 0;
     this.rows[i].colFocus(0);
+    this.emitPatternSelected();
+  };
+
+  /**
+   * @returns {Pattern}
+   */
+  getSelectedPattern = () => {
+    return this.song.patterns[this.focusedRow];
+  };
+
+  emitPatternSelected = () => {
+    Events.emit('patternSelected', this.getSelectedPattern());
   };
 
   cursorUp = () => {
     if (this.focusedRow === 0) return;
     this.rows[--this.focusedRow].colFocus(this.focusedCol);
+    this.emitPatternSelected();
   };
 
   cursorDown = () => {
     if (this.focusedRow === this.rows.length - 1) return;
     this.rows[++this.focusedRow].colFocus(this.focusedCol);
+    this.emitPatternSelected();
   };
 
   cursorLeft = () => {

@@ -3,9 +3,11 @@ import blessed from 'blessed';
 import contrib from 'blessed-contrib';
 import { log } from './utils/log';
 
+import { Events } from './classes/Events';
 import { MidiIO } from './classes/LocalMidi';
 import { Song } from './classes/Song';
 import { Pattern } from './classes/Pattern';
+import { Previewer } from './classes/Previewer';
 import { PatternModes } from './classes/PatternModes';
 import { SaveFiles } from './classes/SaveFiles';
 
@@ -28,11 +30,13 @@ const song = (savedSong)
   ? Song.load(savedSong)
   : new Song();
 
+Previewer.setSong(song);
+
+const list = new PatternList({song});
+
 song.on('touched', () => {
   MainView.setTitleDirty();
 });
-
-const list = new PatternList({song});
 
 MainView.screen.key(['C-s'], () => {
   SaveFiles.saveSong(song);
@@ -57,10 +61,6 @@ MainView.screen.key(['left', 'S-tab'], () => {
 MainView.screen.key(['right', 'tab'], () => {
   if (MainView.isModalOpen) return;
   list.cursorRight();
-});
-
-MainView.screen.key(['C-space'], () => {
-
 });
 
 MainView.append(list.node);

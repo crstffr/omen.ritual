@@ -58,6 +58,9 @@ export class Pattern extends EventEmitter {
   /** @type {boolean} */
   isPlaying = false;
 
+  /** @type {boolean} */
+  isPlayOnce = false;
+
   /** @type {*} */
   openNotes = {};
 
@@ -109,6 +112,14 @@ export class Pattern extends EventEmitter {
     this.loadFile(this.file);
   }
 
+  destroy = () => {
+    this.player.stop();
+    for (let i in this) {
+      if (!this.hasOwnProperty(i)) continue;
+      delete this[i];
+    }
+  };
+
   /**
    *
    * @returns {PatternOpts}
@@ -129,6 +140,7 @@ export class Pattern extends EventEmitter {
 
   /**
    * @param {string} val
+   * @returns {boolean}
    */
   loadFile = (val) => {
     if (!val) return;
@@ -136,9 +148,10 @@ export class Pattern extends EventEmitter {
     try {
       this.file = val;
       this.player.loadFile(this.file);
+      return true;
     } catch (e) {
-      log(e);
       this.file = '';
+      return false;
     }
   };
 
@@ -209,18 +222,19 @@ export class Pattern extends EventEmitter {
    *
    */
   play = (immediate) => {
+    if (!this.file) return false;
     setTimeout(() => {
       if (this.player.isPlaying()) return;
-
       this.player.play();
       this.isPlaying = true;
-
-      setTimeout(() => {
-        if (this.tempo > 0) return;
-        this.setTempo(MidiIO.clockTempo);
-      }, 100);
-
+      this.emit('play');
     }, immediate ? 0 : this.padStart);
+    return true;
+  };
+
+  playOnce = (immediate) => {
+    this.isPlayOnce = true;
+    this.play(immediate);
   };
 
   /**
@@ -244,10 +258,8 @@ export class Pattern extends EventEmitter {
    *
    */
   stop = () => {
-
     this.resetPlayer();
-    this.setTempo(MidiIO.clockTempo);
-
+    this.emit('stop');
   };
 
   /**
@@ -313,10 +325,13 @@ export class Pattern extends EventEmitter {
    *
    */
   onPatternEnd = () => {
-
     setTimeout(() => {
-
       this.resetPlayer();
+
+      if (this.isPlayOnce) {
+        this.isPlayOnce = false;
+        return;
+      }
 
       if (this.mode === PatternModes.LOOP) {
         setTimeout(() => this.play(true), 0);

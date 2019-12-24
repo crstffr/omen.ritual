@@ -8,11 +8,17 @@ export class Song extends EventEmitter {
   /** @type {number} */
   channel;
 
+  /** @type {boolean} */
+  isPlaying;
+
   /** @type {string} */
   name;
 
   /** @type {Pattern[]} */
   patterns = [];
+
+  /** @type {number} */
+  tempo = 120;
 
   /**
    *
@@ -63,6 +69,7 @@ export class Song extends EventEmitter {
       pattern.setTrigNote(note);
     }
 
+    pattern.setTempo(this.tempo);
     pattern.on('touched', () => this.emit('touched'));
     this.patterns.push(pattern);
     this.emit('updated');
@@ -77,6 +84,14 @@ export class Song extends EventEmitter {
     this.patterns = this.patterns.filter((_, i) => (index !== i));
     this.emit('updated');
     this.emit('touched');
+  };
+
+  /**
+   *
+   * @param {number} val
+   */
+  setTempo = (val) => {
+    this.tempo = val;
   };
 
   /**
@@ -115,7 +130,8 @@ export class Song extends EventEmitter {
     if (msg.velocity === 0) return;
 
     this.patterns.forEach(pattern => {
-      if (msg.note === pattern.trigNote) pattern.trigger();
+      if (msg.note !== pattern.trigNote) return;
+      pattern.trigger();
     });
   };
 
@@ -123,10 +139,12 @@ export class Song extends EventEmitter {
     this.patterns.forEach(pattern => {
       if (pattern.autoPlay) pattern.play()
     });
+    this.isPlaying = true;
   };
 
   stop = () => {
     this.patterns.forEach(pattern => pattern.stop());
+    this.isPlaying = false;
   };
 
 }
