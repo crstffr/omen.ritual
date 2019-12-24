@@ -5,8 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node main.js",
-    "watch": "nodemon main.js",
-    "tui": "nodemon -I -w ./src -r esm ./src/tui.js"
+    "watch": "nodemon -I -w ./src main.js"
   },
   "keywords": [],
   "author": "",
