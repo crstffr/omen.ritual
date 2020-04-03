@@ -339,8 +339,7 @@ export class PatternListRow {
           if (description) {
             val = description;
           } else {
-            const midiPath = absFromRoot('midi');
-            val = path.relative(midiPath, file);
+            val = path.relative(process.env.MIDI_FOLDER, file);
           }
           val = val.slice(0, fileWidth).padEnd(fileWidth);
           break;

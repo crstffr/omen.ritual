@@ -1,12 +1,13 @@
 import path from 'path';
-import { ModalFormFilePicker } from '../components/ModalFormFilePicker';
+
 import { Events } from '../classes/Events';
-import { absFromRoot } from '../utils/root';
 import { log } from '../utils/log';
+
+import { ModalFormFilePicker } from '../components/ModalFormFilePicker';
 
 export const PatternFileModal = new ModalFormFilePicker({
   label: 'File',
-  baseDir: absFromRoot('/midi'),
+  baseDir: process.env.MIDI_FOLDER,
   validFileExts: ['.mid', '.midi']
 });
 

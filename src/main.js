@@ -20,10 +20,10 @@ import { absFromRoot } from './utils/root';
 try { process.on('uncaughtException', log); } catch(e) { log(e) }
 
 if (!MidiIO.connect({
-  input:  'MIDI4x4 Midi In 1',
-  output: 'MIDI4x4 Midi Out 1'
+  input:  process.env.MIDI_DEVICE_INPUT,
+  output: process.env.MIDI_DEVICE_OUTPUT
 })) {
-  console.log('UNABLE TO CONNECT');
+  log('UNABLE TO CONNECT MIDI');
   // process.exit(1);
 }
 
